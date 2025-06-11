@@ -26,7 +26,7 @@ st.sidebar.header("⚙️ Pipeline Parameters")
 cfg = load_config()
 
 st.sidebar.markdown("### 🌍 Location")
-location_mode = st.sidebar.radio("Input mode for location", ["Enter manually", "Search by name"])
+location_mode = st.sidebar.radio("Input mode for location", ["Search by name", "Enter manually (must be exact as on iNaturalist)"])
 
 if location_mode == "Enter manually":
     location = st.sidebar.text_input("Location name", cfg.get("location_name", ""))
@@ -42,7 +42,7 @@ else:
             location = matching_places[selected_index]["display_name"]
 
 st.sidebar.markdown("### 🐾 Species")
-species_mode = st.sidebar.radio("Species input mode", ["Any species", "Enter manually", "Search by name"])
+species_mode = st.sidebar.radio("Species input mode", ["Any species", "Search by name", "Enter manually (must be exact as on iNaturalist)"])
 
 taxon = None
 if species_mode == "Enter manually":

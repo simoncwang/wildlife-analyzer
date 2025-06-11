@@ -12,7 +12,7 @@ def save_config(config):
     with open(CONFIG_PATH, "w") as f:
         yaml.safe_dump(config, f, default_flow_style=False)
 
-def search_taxa(query, limit=5):
+def search_taxa(query, limit=10):
     url = "https://api.inaturalist.org/v1/taxa"
     params = {
         "q": query,
