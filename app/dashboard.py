@@ -9,9 +9,6 @@ import subprocess
 import sys
 import mlflow
 
-
-st.text(subprocess.getoutput("pip list"))
-
 # Dynamically add project root to path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if project_root not in sys.path:
@@ -139,7 +136,7 @@ with tabs[1]:
             # with mlflow.start_run(run_name="wildlife_pipeline") as run:
 
                 st.write("📥 **Fetching observations from iNaturalist API...**")
-                result = subprocess.run(["python", "pipeline/fetch_and_log.py"], capture_output=True, text=True)
+                result = subprocess.run([sys.executable, "pipeline/fetch_and_log.py"], capture_output=True, text=True)
                 st.write(result.stdout)
                 # mlflow.log_text(result.stdout, "logs/fetch.log")
                 if result.returncode != 0:
@@ -151,7 +148,7 @@ with tabs[1]:
                     st.stop()
 
                 st.write("🧹 **Preprocessing observations...**")
-                result = subprocess.run(["python", "pipeline/preprocess.py"], capture_output=True, text=True)
+                result = subprocess.run([sys.executable, "pipeline/preprocess.py"], capture_output=True, text=True)
                 st.write(result.stdout)
                 # mlflow.log_text(result.stdout, "logs/preprocess.log")
                 if result.returncode != 0:
@@ -162,7 +159,7 @@ with tabs[1]:
 
                 if run_mode in ["clustering", "both"]:
                     st.write("🧠 **Feature engineering...**")
-                    result = subprocess.run(["python", "pipeline/feature_engineering.py"], capture_output=True, text=True)
+                    result = subprocess.run(sys.executable, "pipeline/feature_engineering.py"], capture_output=True, text=True)
                     st.write(result.stdout)
                     # mlflow.log_text(result.stdout, "logs/features.log")
                     if result.returncode != 0:
@@ -172,7 +169,7 @@ with tabs[1]:
                         st.stop()
 
                     st.write("🔗 **Clustering observations (location, species)...**")
-                    result = subprocess.run(["python", "models/cluster.py"], capture_output=True, text=True)
+                    result = subprocess.run([sys.executable, "models/cluster.py"], capture_output=True, text=True)
                     st.write(result.stdout)
                     # mlflow.log_text(result.stdout, "logs/clustering.log")
                     if result.returncode != 0:
@@ -187,7 +184,7 @@ with tabs[1]:
 
                 if run_mode in ["llm_summary", "both"]:
                     st.write("🧠 **Generating LLM summary...**")
-                    result = subprocess.run(["python", "models/llm_summary.py"], capture_output=True, text=True)
+                    result = subprocess.run([sys.executable, "models/llm_summary.py"], capture_output=True, text=True)
                     st.write(result.stdout)
                     # mlflow.log_text(result.stdout, "logs/llm_summary.log")
                     if result.returncode != 0:
