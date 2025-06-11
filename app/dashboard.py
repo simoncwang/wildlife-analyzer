@@ -177,6 +177,8 @@ with tabs[1]:
                         st.error("❌ Clustering failed.")
                         status.update(label="Pipeline failed", state="error")
                         st.stop()
+                    
+                    st.write("📊 **Check out the results in the Cluster Visualization tab!**")
 
                     # latest_cluster = max(glob.glob("data/clustered/*.csv"), default=None, key=os.path.getmtime)
                     # if latest_cluster:
@@ -315,8 +317,8 @@ with tabs[4]:
                 mime="text/plain"
             )
             st.success("Summary generated successfully!")
-        else:
-            st.info("No summary generated yet. Run the pipeline to produce one.")
+    else:
+        st.info("No LLM summary generated yet. Run the pipeline with 'llm_summary' or 'both' mode.")
 
 # PREVIEW CLEANED DATA
 with tabs[5]:
