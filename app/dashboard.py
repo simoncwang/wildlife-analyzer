@@ -108,7 +108,7 @@ with tabs[0]:
     **Have fun exploring wildlife data! 🫎**
                 
     #### Note (using MLflow):
-    - The pipeline stages are set up to be logged using [MLflow](https://mlflow.org/), which allows you to track runs, parameters, and artifacts.
+    - The pipeline stages are set up to be logged using [MLflow](https://mlflow.org/), which allows you to track runs, parameters, and artifacts. Currently all mlflow code is commented out, but you can uncomment it to enable logging.
     - To use MLflow with this dashboard, you must install and run the project locally by cloning and following the instructions in the [GitHub repository](https://github.com/simoncwang/wildlife-analyzer)
     - Once set up, you can view and track various runs, parameters, artifacts, and model metrics in the MLflow UI.
     - Currently, I have only set up some basic logging, but you can extend it to log more detailed metrics, artifacts, and parameters as needed by inspecting the code in the UI and models directory scripts.
@@ -133,14 +133,14 @@ with tabs[1]:
 
     if st.button("▶️ **Run Full Pipeline**"):
         with st.status("Running pipeline...", expanded=True) as status:
-            with mlflow.start_run(run_name="wildlife_pipeline") as run:
+            # with mlflow.start_run(run_name="wildlife_pipeline") as run:
 
                 st.write("📥 **Fetching observations from iNaturalist API...**")
                 result = subprocess.run(["python", "pipeline/fetch_and_log.py"], capture_output=True, text=True)
                 st.write(result.stdout)
-                mlflow.log_text(result.stdout, "logs/fetch.log")
+                # mlflow.log_text(result.stdout, "logs/fetch.log")
                 if result.returncode != 0:
-                    mlflow.set_tag("status", "failed_fetch")
+                    # mlflow.set_tag("status", "failed_fetch")
                     st.error("❌ Fetch failed.")
                     status.update(label="Pipeline failed", state="error")
                     st.stop()
@@ -148,9 +148,9 @@ with tabs[1]:
                 st.write("🧹 **Preprocessing observations...**")
                 result = subprocess.run(["python", "pipeline/preprocess.py"], capture_output=True, text=True)
                 st.write(result.stdout)
-                mlflow.log_text(result.stdout, "logs/preprocess.log")
+                # mlflow.log_text(result.stdout, "logs/preprocess.log")
                 if result.returncode != 0:
-                    mlflow.set_tag("status", "failed_preprocess")
+                    # mlflow.set_tag("status", "failed_preprocess")
                     st.error("❌ Preprocessing failed.")
                     status.update(label="Pipeline failed", state="error")
                     st.stop()
@@ -159,9 +159,9 @@ with tabs[1]:
                     st.write("🧠 **Feature engineering...**")
                     result = subprocess.run(["python", "pipeline/feature_engineering.py"], capture_output=True, text=True)
                     st.write(result.stdout)
-                    mlflow.log_text(result.stdout, "logs/features.log")
+                    # mlflow.log_text(result.stdout, "logs/features.log")
                     if result.returncode != 0:
-                        mlflow.set_tag("status", "failed_feature_eng")
+                        # mlflow.set_tag("status", "failed_feature_eng")
                         st.error("❌ Feature engineering failed.")
                         status.update(label="Pipeline failed", state="error")
                         st.stop()
@@ -169,31 +169,31 @@ with tabs[1]:
                     st.write("🔗 **Clustering observations (location, species)...**")
                     result = subprocess.run(["python", "models/cluster.py"], capture_output=True, text=True)
                     st.write(result.stdout)
-                    mlflow.log_text(result.stdout, "logs/clustering.log")
+                    # mlflow.log_text(result.stdout, "logs/clustering.log")
                     if result.returncode != 0:
-                        mlflow.set_tag("status", "failed_clustering")
+                        # mlflow.set_tag("status", "failed_clustering")
                         st.error("❌ Clustering failed.")
                         status.update(label="Pipeline failed", state="error")
                         st.stop()
 
-                    latest_cluster = max(glob.glob("data/clustered/*.csv"), default=None, key=os.path.getmtime)
-                    if latest_cluster:
-                        mlflow.log_artifact(latest_cluster, artifact_path="clustered")
+                    # latest_cluster = max(glob.glob("data/clustered/*.csv"), default=None, key=os.path.getmtime)
+                    # if latest_cluster:
+                    #     mlflow.log_artifact(latest_cluster, artifact_path="clustered")
 
                 if run_mode in ["llm_summary", "both"]:
                     st.write("🧠 **Generating LLM summary...**")
                     result = subprocess.run(["python", "models/llm_summary.py"], capture_output=True, text=True)
                     st.write(result.stdout)
-                    mlflow.log_text(result.stdout, "logs/llm_summary.log")
+                    # mlflow.log_text(result.stdout, "logs/llm_summary.log")
                     if result.returncode != 0:
-                        mlflow.set_tag("status", "failed_llm_summary")
+                        # mlflow.set_tag("status", "failed_llm_summary")
                         st.error("❌ LLM summary failed.")
                         status.update(label="Pipeline failed", state="error")
                         st.stop()
 
-                    summary_path = "data/summary/latest_summary.txt"
-                    if os.path.exists(summary_path):
-                        mlflow.log_artifact(summary_path, artifact_path="summary")
+                    # summary_path = "data/summary/latest_summary.txt"
+                    # if os.path.exists(summary_path):
+                    #     mlflow.log_artifact(summary_path, artifact_path="summary")
 
                 run_metadata = {
                     "mode": run_mode,
@@ -202,15 +202,15 @@ with tabs[1]:
                 with open("data/last_run.json", "w") as f:
                     json.dump(run_metadata, f)
 
-                mlflow.log_params({
-                    "location": location,
-                    "species": taxon or "Any",
-                    "per_page": per_page,
-                    "n_clusters": n_clusters,
-                    "run_mode": run_mode
-                })
+                # mlflow.log_params({
+                #     "location": location,
+                #     "species": taxon or "Any",
+                #     "per_page": per_page,
+                #     "n_clusters": n_clusters,
+                #     "run_mode": run_mode
+                # })
 
-                mlflow.set_tag("status", "completed")
+                # mlflow.set_tag("status", "completed")
                 st.success("✅ All pipeline stages completed successfully!")
                 status.update(label="Pipeline complete", state="complete")
 

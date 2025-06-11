@@ -52,22 +52,38 @@ if __name__ == "__main__":
     df = load_clean_data(os.path.join("data/processed", latest_file))
 
     observations = process_df(df)
-    
-    with mlflow.start_run(run_name="llm_summary"):
-        mlflow.set_tag("stage", "llm_summary")
-        mlflow.log_params({
-            "location": cfg["location_name"],
-            "taxon": cfg["taxon_name"],
-            "run_mode": cfg["run_mode"]
-        })
 
-        start = time.time()
-        summary = summarize_observations(observations)
-        mlflow.log_metric("llm_latency", time.time() - start)
-        mlflow.log_metric("summary_length", len(summary.split()))
+    summary = summarize_observations(observations)
+    
+    # save and log summary
+    summary_path = "data/summary/latest_summary.txt"
+    with open(summary_path, "w") as f:
+        f.write(summary)
+    mlflow.log_artifact(summary_path)
+    
+    # COMMENT OUT ABOVE AND UNCOMMENT BELOW TO USE MLFLOW
+    # cfg = load_config()
+    # latest_file = sorted(os.listdir("data/processed"))[-1]
+
+    # print(f"🔍 Loading data from {latest_file}")
+    # df = load_clean_data(os.path.join("data/processed", latest_file))
+
+    # observations = process_df(df)
+    # with mlflow.start_run(run_name="llm_summary"):
+    #     mlflow.set_tag("stage", "llm_summary")
+    #     mlflow.log_params({
+    #         "location": cfg["location_name"],
+    #         "taxon": cfg["taxon_name"],
+    #         "run_mode": cfg["run_mode"]
+    #     })
+
+    #     start = time.time()
+        # summary = summarize_observations(observations)
+        # mlflow.log_metric("llm_latency", time.time() - start)
+        # mlflow.log_metric("summary_length", len(summary.split()))
     
         # save and log summary
-        summary_path = "data/summary/latest_summary.txt"
-        with open(summary_path, "w") as f:
-            f.write(summary)
-        mlflow.log_artifact(summary_path)
+        # summary_path = "data/summary/latest_summary.txt"
+        # with open(summary_path, "w") as f:
+        #     f.write(summary)
+        # mlflow.log_artifact(summary_path)
