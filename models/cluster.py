@@ -58,11 +58,20 @@ def plot_clusters_interactive(df, labels):
     fig.show()
 
 def cluster_data(features, df, n_clusters):
-    #  with mlflow.start_run(run_name="kmeans_clustering", nested=True):
-        model = KMeans(n_clusters=n_clusters, random_state=42)
-        labels = model.fit_predict(features)
+    n_samples = features.shape[0]
+    if n_samples < n_clusters:
+        n_clusters = n_samples  # Adjust to number of samples if fewer than clusters
+    
+    model = KMeans(n_clusters=n_clusters, random_state=42)
+    labels = model.fit_predict(features)
 
-        df["cluster"] = labels
+    df["cluster"] = labels
+    
+    #  with mlflow.start_run(run_name="kmeans_clustering", nested=True):
+        # model = KMeans(n_clusters=n_clusters, random_state=42)
+        # labels = model.fit_predict(features)
+
+        # df["cluster"] = labels
 
         # mlflow.log_param("n_clusters", n_clusters)
         # mlflow.log_metric("inertia", model.inertia_)
@@ -87,7 +96,7 @@ def cluster_data(features, df, n_clusters):
 
         # mlflow.log_metric("num_features", features.shape[1])
 
-        return df
+    return df
 
 if __name__ == "__main__":
     cfg = load_config()
