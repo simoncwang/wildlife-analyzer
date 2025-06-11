@@ -2,7 +2,6 @@ import os
 import json
 import sys
 from datetime import datetime
-import yaml
 
 # Dynamically add project root to path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
