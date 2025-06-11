@@ -2,3 +2,8 @@ openai
 requests
 dotenv
 streamlit
+scikit-learn
+matplotlib
+plotly
+pyyaml
+mlflow

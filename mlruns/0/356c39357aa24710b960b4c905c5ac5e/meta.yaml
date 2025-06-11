@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/simoncwang/Desktop/beep%20boop/personal%20projects/wildlife-analyzer/mlruns/0/356c39357aa24710b960b4c905c5ac5e/artifacts
+end_time: 1749678013453
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 356c39357aa24710b960b4c905c5ac5e
+run_name: kmeans_clustering
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1749678013431
+status: 4
+tags: []
+user_id: simoncwang

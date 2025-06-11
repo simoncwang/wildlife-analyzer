@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/simoncwang/Desktop/beep%20boop/personal%20projects/wildlife-analyzer/mlruns/0/20343a8f369b41e5ad93e95760a9391e/artifacts
+end_time: 1749677337923
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 20343a8f369b41e5ad93e95760a9391e
+run_name: stately-turtle-857
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1749677337889
+status: 3
+tags: []
+user_id: simoncwang

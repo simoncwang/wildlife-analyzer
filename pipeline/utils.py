@@ -1,0 +1,74 @@
+import requests
+import json
+import os
+import yaml
+
+CONFIG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "pipeline_config.yaml"))
+
+def load_config():
+    with open(CONFIG_PATH) as f:
+        return yaml.safe_load(f)
+
+def save_config(config):
+    with open(CONFIG_PATH, "w") as f:
+        yaml.safe_dump(config, f, default_flow_style=False)
+
+def search_taxa(query, limit=5):
+    url = "https://api.inaturalist.org/v1/taxa"
+    params = {
+        "q": query,
+        "per_page": limit
+    }
+    response = requests.get(url, params=params)
+    return response.json().get("results", [])
+
+def search_places(query):
+    url = "https://api.inaturalist.org/v1/places/autocomplete"
+    params = {"q": query}
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        return response.json().get("results", [])
+    return []
+
+def get_place_id(place_name):
+    """Look up iNaturalist place ID using the autocomplete API."""
+    url = "https://api.inaturalist.org/v1/places/autocomplete"
+    params = {"q": place_name}
+    response = requests.get(url, params=params)
+    results = response.json().get("results", [])
+    
+    if results:
+        return results[0]["id"], results[0]["display_name"]
+    else:
+        return None, None
+
+def fetch_observations(place_name=None, place_id=None, taxon_name=None, per_page=20):
+    """Fetch observations from iNaturalist using either place_id or place_name."""
+    
+    # If no place_id is provided, try to resolve it from place_name
+    resolved_place_name = None
+    if not place_id and place_name:
+        place_id, resolved_place_name = get_place_id(place_name)
+        if not place_id:
+            raise ValueError(f"Could not find place ID for: {place_name}")
+    
+    url = "https://api.inaturalist.org/v1/observations"
+    params = {
+        "per_page": per_page,
+        "order_by": "observed_on",
+        "order": "desc",
+        "verifiable": "true",
+        "photos": "true",
+        "place_id": place_id
+    }
+    if taxon_name:
+        params["taxon_name"] = taxon_name
+
+    response = requests.get(url, params=params)
+    data = response.json()
+    
+    # os.makedirs("results", exist_ok=True)
+    # with open("results/observations.json", "w") as f:
+    #     json.dump(data, f, indent=2)
+
+    return data, resolved_place_name or place_name

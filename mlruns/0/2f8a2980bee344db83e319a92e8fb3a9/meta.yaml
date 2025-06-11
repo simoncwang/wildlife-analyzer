@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/simoncwang/Desktop/beep%20boop/personal%20projects/wildlife-analyzer/mlruns/0/2f8a2980bee344db83e319a92e8fb3a9/artifacts
+end_time: 1749677337886
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 2f8a2980bee344db83e319a92e8fb3a9
+run_name: skillful-bee-3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1749677329736
+status: 3
+tags: []
+user_id: simoncwang

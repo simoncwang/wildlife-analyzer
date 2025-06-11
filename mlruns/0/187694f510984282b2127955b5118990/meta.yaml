@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/simoncwang/Desktop/beep%20boop/personal%20projects/wildlife-analyzer/mlruns/0/187694f510984282b2127955b5118990/artifacts
+end_time: 1749677466576
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 187694f510984282b2127955b5118990
+run_name: llm_summary
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1749677455913
+status: 3
+tags: []
+user_id: simoncwang
