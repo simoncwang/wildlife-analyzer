@@ -59,7 +59,6 @@ if __name__ == "__main__":
     summary_path = "data/summary/latest_summary.txt"
     with open(summary_path, "w") as f:
         f.write(summary)
-    mlflow.log_artifact(summary_path)
     
     # COMMENT OUT ABOVE AND UNCOMMENT BELOW TO USE MLFLOW
     # cfg = load_config()
