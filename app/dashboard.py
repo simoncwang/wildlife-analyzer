@@ -188,7 +188,6 @@ with tabs[1]:
                     st.write("🧠 **Generating LLM summary...**")
                     result = subprocess.run([sys.executable, "models/llm_summary.py"], capture_output=True, text=True)
                     st.write(result.stdout)
-                    st.write(result.stderr)
                     # mlflow.log_text(result.stdout, "logs/llm_summary.log")
                     if result.returncode != 0:
                         # mlflow.set_tag("status", "failed_llm_summary")
