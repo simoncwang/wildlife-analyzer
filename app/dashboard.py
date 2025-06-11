@@ -31,7 +31,7 @@ location_mode = st.sidebar.radio("Input mode for location", ["Search by name", "
 if location_mode == "Enter manually (must be exact as on iNaturalist)":
     location = st.sidebar.text_input("Location name", cfg.get("location_name", ""))
 else:
-    place_query = st.sidebar.text_input("🔍 Search place name")
+    place_query = st.sidebar.text_input("🔍 Search place name", cfg.get("location_name", ""))
     location = ""
     if place_query:
         matching_places = search_places(place_query)
