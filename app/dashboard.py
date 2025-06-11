@@ -174,6 +174,7 @@ with tabs[1]:
                     # mlflow.log_text(result.stdout, "logs/clustering.log")
                     if result.returncode != 0:
                         # mlflow.set_tag("status", "failed_clustering")
+                        st.write(result.stderr)
                         st.error("❌ Clustering failed.")
                         status.update(label="Pipeline failed", state="error")
                         st.stop()
