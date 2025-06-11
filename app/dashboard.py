@@ -159,7 +159,7 @@ with tabs[1]:
 
                 if run_mode in ["clustering", "both"]:
                     st.write("🧠 **Feature engineering...**")
-                    result = subprocess.run(sys.executable, "pipeline/feature_engineering.py"], capture_output=True, text=True)
+                    result = subprocess.run([sys.executable, "pipeline/feature_engineering.py"], capture_output=True, text=True)
                     st.write(result.stdout)
                     # mlflow.log_text(result.stdout, "logs/features.log")
                     if result.returncode != 0:
