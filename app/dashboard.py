@@ -142,6 +142,8 @@ with tabs[1]:
                 if result.returncode != 0:
                     # mlflow.set_tag("status", "failed_fetch")
                     st.error("❌ Fetch failed.")
+                    st.write(result.stdout)
+                    st.write(result.stderr)
                     status.update(label="Pipeline failed", state="error")
                     st.stop()
 
