@@ -41,7 +41,7 @@ def main():
         json.dump(data, f, indent=2)
 
     print(f"✅ Saved {len(data.get('results', []))} observations to {LATEST_OUTPUT}")
-    print(f"🗃️ Also saved to: {timestamped_path}")
+    print(f" Also saved to: {timestamped_path}")
     print(f"📍 Resolved location: {resolved}")
 
 if __name__ == "__main__":
