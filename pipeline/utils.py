@@ -21,13 +21,14 @@ def search_taxa(query, limit=10):
     response = requests.get(url, params=params)
     return response.json().get("results", [])
 
-def search_places(query):
+def search_places(query, limit=10):
     url = "https://api.inaturalist.org/v1/places/autocomplete"
-    params = {"q": query}
+    params = {
+        "q": query,
+        "per_page": limit
+    }
     response = requests.get(url, params=params)
-    if response.status_code == 200:
-        return response.json().get("results", [])
-    return []
+    return response.json().get("results", [])
 
 def get_place_id(place_name):
     """Look up iNaturalist place ID using the autocomplete API."""
