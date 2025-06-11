@@ -28,7 +28,7 @@ cfg = load_config()
 st.sidebar.markdown("### 🌍 Location")
 location_mode = st.sidebar.radio("Input mode for location", ["Search by name", "Enter manually (must be exact as on iNaturalist)"])
 
-if location_mode == "Enter manually":
+if location_mode == "Enter manually (must be exact as on iNaturalist)":
     location = st.sidebar.text_input("Location name", cfg.get("location_name", ""))
 else:
     place_query = st.sidebar.text_input("🔍 Search place name")
@@ -45,7 +45,7 @@ st.sidebar.markdown("### 🐾 Species")
 species_mode = st.sidebar.radio("Species input mode", ["Any species", "Search by name", "Enter manually (must be exact as on iNaturalist)"])
 
 taxon = None
-if species_mode == "Enter manually":
+if species_mode == "Enter manually (must be exact as on iNaturalist)":
     taxon = st.sidebar.text_input("Species (taxon_name)", cfg.get("taxon_name") or "")
 elif species_mode == "Search by name":
     taxon_query = st.sidebar.text_input("🔍 Search species name")
