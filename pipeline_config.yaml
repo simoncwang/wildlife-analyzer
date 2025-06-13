@@ -1,4 +1,4 @@
-cloud_backend: s3
+cloud_backend: mock
 date_range:
   end: None
   start: None
