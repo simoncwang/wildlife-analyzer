@@ -1,6 +1,6 @@
 import os
-import json
 import sys
+import json
 from datetime import datetime
 
 # Dynamically add project root to path
@@ -9,40 +9,47 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 from pipeline.utils import fetch_observations, load_config
-
-LATEST_OUTPUT = "data/logs/latest_observations.json"
-TIMESTAMPED_DIR = "data/raw"
+from cloud.upload import upload_to_mock_cloud
 
 def main():
-    # Load configuration
     cfg = load_config()
-    loc = cfg["location_name"]
+    location = cfg["location_name"]
     taxon = cfg.get("taxon_name")
-    per_page = cfg.get("per_page",20)
+    per_page = cfg.get("per_page", 50)
+    date_range = cfg.get("date_range")
+    start = None
+    end = None
+    
 
-    print(f"🔍 Fetching {per_page} observations for: {loc}")
-    data, resolved = fetch_observations(place_name=loc, taxon_name=taxon, per_page=per_page)
+    print(f"📅 Fetching observations for {location} (taxon: {taxon or 'any'})")
+    
+    if date_range:
+        start = date_range.get("start")
+        end = date_range.get("end")
+        print(f"📆 Between dates: {start} and {end}")
+        date_tag = f"{start}_{end}"
+    else:
+        print("📆 No date range specified, fetching latest observations")
+        date_tag = datetime.now().strftime("%Y-%m-%d")
 
-    # Save latest
-    os.makedirs(os.path.dirname(LATEST_OUTPUT), exist_ok=True)
+    result, resolved_place_name = fetch_observations(
+        place_name=cfg.get("location_name"),
+        taxon_name=cfg.get("taxon_name"),
+        per_page=cfg.get("per_page", 20),
+        date_start=start,
+        date_end=end
+    )
 
-    # adding timestamp and location to the json data
-    data["timestamp"] = datetime.now().isoformat()
-    data["input_location"] = loc
-    data["resolved_location"] = resolved
-    with open(LATEST_OUTPUT, "w") as f:
-        json.dump(data, f, indent=2)
+    log_path = os.path.join("data/logs", f"observations_{date_tag}.json")
+    with open(log_path, "w") as f:
+        json.dump(result, f, indent=2)
 
-    # Save timestamped raw
-    os.makedirs(TIMESTAMPED_DIR, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    timestamped_path = os.path.join(TIMESTAMPED_DIR, f"observations_{timestamp}.json")
-    with open(timestamped_path, "w") as f:
-        json.dump(data, f, indent=2)
+    # save_log(result, log_path)
+    print(f"✅ Saved log to {log_path}")
 
-    print(f"✅ Saved {len(data.get('results', []))} observations to {LATEST_OUTPUT}")
-    print(f" Also saved to: {timestamped_path}")
-    print(f"📍 Resolved location: {resolved}")
+    # # uploading to mock cloud (can be replaced with actual cloud upload logic)
+    # uploaded_path = upload_to_mock_cloud(log_path)
+    # print(f"✅ Uploaded log to mock cloud")
 
 if __name__ == "__main__":
     cfg = load_config()

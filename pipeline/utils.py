@@ -42,8 +42,10 @@ def get_place_id(place_name):
     else:
         return None, None
 
-def fetch_observations(place_name=None, place_id=None, taxon_name=None, per_page=20):
-    """Fetch observations from iNaturalist using either place_id or place_name."""
+def fetch_observations(place_name=None, place_id=None, taxon_name=None, per_page=20, date_start=None, date_end=None):
+    """Fetch observations from iNaturalist using either place_id or place_name.
+       Optionally filter by date range using ISO format: YYYY-MM-DD.
+    """
     
     # If no place_id is provided, try to resolve it from place_name
     resolved_place_name = None
@@ -61,14 +63,15 @@ def fetch_observations(place_name=None, place_id=None, taxon_name=None, per_page
         "photos": "true",
         "place_id": place_id
     }
+
     if taxon_name:
         params["taxon_name"] = taxon_name
+    if date_start:
+        params["d1"] = date_start
+    if date_end:
+        params["d2"] = date_end
 
     response = requests.get(url, params=params)
     data = response.json()
-    
-    # os.makedirs("results", exist_ok=True)
-    # with open("results/observations.json", "w") as f:
-    #     json.dump(data, f, indent=2)
 
     return data, resolved_place_name or place_name

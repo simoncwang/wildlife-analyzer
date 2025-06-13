@@ -14,14 +14,14 @@ python pipeline/fetch_and_log.py
 python pipeline/preprocess.py
 
 # Clustering
-if [[ "$RUN_MODE" == "clustering" || "$RUN_MODE" == "both" ]]; then
+if [[ "$RUN_MODE" == "clustering"]; then
   echo "🔢 Running clustering step..."
   python pipeline/feature_engineering.py
   python models/cluster.py
 fi
 
 # LLM Summary
-if [[ "$RUN_MODE" == "llm_summary" || "$RUN_MODE" == "both" ]]; then
+if [[ "$RUN_MODE" == "llm_summary"]; then
   echo "🧠 Running LLM summary step..."
   python models/llm_summary.py
 fi

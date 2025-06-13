@@ -22,10 +22,10 @@ st.title("🦉 Wildlife Analyzer Dashboard")
 st.markdown("*Simon Wang | [Website](https://simoncwang.github.io/)* 🌐 *| [GitHub](https://github.com/simoncwang)* 👨‍💻 *| [LinkedIn](https://www.linkedin.com/in/simon-wang-519902193/)* 🔗")
 
 # --- SIDEBAR ---
-st.sidebar.header("⚙️ Pipeline Parameters")
+st.sidebar.header("⚙️ Settings")
 cfg = load_config()
 
-st.sidebar.markdown("### 🌍 Location")
+st.sidebar.markdown("### Location")
 location_mode = st.sidebar.radio("Input mode for location", ["Search by name", "Enter manually (must be exact as on iNaturalist)"])
 
 if location_mode == "Enter manually (must be exact as on iNaturalist)":
@@ -41,7 +41,7 @@ else:
             selected_index = place_options.index(selected)
             location = matching_places[selected_index]["display_name"]
 
-st.sidebar.markdown("### 🐾 Species")
+st.sidebar.markdown("### Species")
 species_mode = st.sidebar.radio("Species input mode", ["Any species", "Search by name", "Enter manually (must be exact as on iNaturalist)"])
 
 taxon = None
@@ -61,24 +61,74 @@ elif species_mode == "Search by name":
             selected_index = taxon_options.index(selected)
             taxon = matching_taxa[selected_index]["name"]
 
-per_page = st.sidebar.number_input("Observations (max 200)", min_value=1, max_value=200, value=cfg.get("per_page", 50))
-n_clusters = st.sidebar.number_input("# Clusters for KMeans", min_value=1, max_value=20, value=cfg.get("n_clusters", 5))
-run_mode = st.sidebar.selectbox("Pipeline Run Mode", options=["clustering", "llm_summary", "both"],
-                                index=["clustering", "llm_summary", "both"].index(cfg.get("run_mode", "clustering")))
+st.sidebar.markdown("### Pipeline Parameters")
+
+per_page = st.sidebar.number_input("Number of Observations (max 200)", min_value=1, max_value=200, value=cfg.get("per_page", 50))
+
+all_modes = ["clustering", "llm_summary", "drift_analysis"]
+default_modes = cfg.get("run_mode", ["clustering"])  # default as list
+run_mode = st.sidebar.multiselect(
+    "Pipeline Run Modes (select one or more)",
+    options=all_modes,
+    default=default_modes
+)
+
+if "clustering" in run_mode or "drift_analysis" in run_mode:
+    n_clusters = st.sidebar.number_input("Number of Clusters for KMeans", min_value=1, max_value=20, value=cfg.get("n_clusters", 5))
+
+# Show date range inputs if enabled
+start_date, end_date = None, None
+date_range = st.sidebar.checkbox("📅 Date Range", value=cfg.get("date_range") is not None)
+if date_range:
+    start_date = st.sidebar.date_input("Start Date")
+    end_date = st.sidebar.date_input("End Date")
+
+if start_date and end_date and start_date > end_date:
+    st.sidebar.error("Start date must be before end date.")
+
+# cloud backend selection
+cloud_backend = st.sidebar.selectbox(
+    "Cloud Backend (only use mock for demo, s3 requires local AWS credentials)",
+    options=["mock", "s3"],
+    index=0 if cfg.get("cloud_backend") == "mock" else 1,
+    help="Select the cloud backend for storing data. 'mock' uses a local directory, 's3' requires AWS credentials."
+)
+
+if cloud_backend == "s3":
+    s3_bucket = st.sidebar.text_input("S3 Bucket Name", value=cfg.get("s3_bucket", ""))
+    if not s3_bucket:
+        st.sidebar.error("S3 Bucket Name is required for S3 backend.")
 
 if st.sidebar.button("💾 Save Parameters"):
     new_cfg = {
         "location_name": location,
         "taxon_name": taxon or None,
         "per_page": int(per_page),
-        "n_clusters": int(n_clusters),
-        "run_mode": run_mode
+        "run_mode": run_mode,
+        "cloud_backend": cloud_backend,
+        "s3_bucket": s3_bucket if cloud_backend == "s3" else None
     }
+    new_cfg["date_range"] = {
+        "start": str(start_date),
+        "end": str(end_date)
+    }
+
+    if "clustering" in run_mode or "drift_analysis" in run_mode:
+        new_cfg["n_clusters"] = int(n_clusters)
+
     save_config(new_cfg)
     st.sidebar.success("Parameters updated!")
 
 # --- TABS ---
-tabs = st.tabs(["📖 Instructions","🚀 Run Pipeline", "📋 Summary", "📍 Cluster Visualization", "🧠 LLM Summary", "🔍 Cleaned Data"])
+tabs = st.tabs([
+    "📖 Instructions",
+    "🚀 Run Pipeline",
+    "📋 Summary",
+    "📍 Cluster Visualization",
+    "🧠 LLM Summary",
+    "🔍 Cleaned Data",
+    "☁️ Mock Cloud Files"
+])
 
 # INSTRUCTIONS
 with tabs[0]:
@@ -131,7 +181,7 @@ with tabs[0]:
 with tabs[1]:
     st.header("🚀 Run Pipeline")
 
-    if st.button("▶️ **Run Full Pipeline**"):
+    if st.button("▶️ **Run**"):
         with st.status("Running pipeline...", expanded=True) as status:
             # with mlflow.start_run(run_name="wildlife_pipeline") as run:
 
@@ -157,16 +207,16 @@ with tabs[1]:
                     status.update(label="Pipeline failed", state="error")
                     st.stop()
 
-                if run_mode in ["clustering", "both"]:
-                    st.write("🧠 **Feature engineering...**")
-                    result = subprocess.run([sys.executable, "pipeline/feature_engineering.py"], capture_output=True, text=True)
-                    st.write(result.stdout)
-                    # mlflow.log_text(result.stdout, "logs/features.log")
-                    if result.returncode != 0:
-                        # mlflow.set_tag("status", "failed_feature_eng")
-                        st.error("❌ Feature engineering failed.")
-                        status.update(label="Pipeline failed", state="error")
-                        st.stop()
+                if "clustering" in run_mode:
+                    # st.write("🧠 **Feature engineering...**")
+                    # result = subprocess.run([sys.executable, "pipeline/feature_engineering.py"], capture_output=True, text=True)
+                    # st.write(result.stdout)
+                    # # mlflow.log_text(result.stdout, "logs/features.log")
+                    # if result.returncode != 0:
+                    #     # mlflow.set_tag("status", "failed_feature_eng")
+                    #     st.error("❌ Feature engineering failed.")
+                    #     status.update(label="Pipeline failed", state="error")
+                    #     st.stop()
 
                     st.write("🔗 **Clustering observations (location, species)...**")
                     result = subprocess.run([sys.executable, "models/cluster.py"], capture_output=True, text=True)
@@ -185,12 +235,13 @@ with tabs[1]:
                     # if latest_cluster:
                     #     mlflow.log_artifact(latest_cluster, artifact_path="clustered")
 
-                if run_mode in ["llm_summary", "both"]:
+                if "llm_summary" in run_mode:
                     st.write("🧠 **Generating LLM summary...**")
                     result = subprocess.run([sys.executable, "models/llm_summary.py"], capture_output=True, text=True)
                     st.write(result.stdout)
                     # mlflow.log_text(result.stdout, "logs/llm_summary.log")
                     if result.returncode != 0:
+                        # st.write(result.stderr)
                         # mlflow.set_tag("status", "failed_llm_summary")
                         st.error("❌ LLM summary failed.")
                         status.update(label="Pipeline failed", state="error")
@@ -201,6 +252,21 @@ with tabs[1]:
                     # summary_path = "data/summary/latest_summary.txt"
                     # if os.path.exists(summary_path):
                     #     mlflow.log_artifact(summary_path, artifact_path="summary")
+                
+                if "drift_analysis" in run_mode:
+                    st.write("📈 **Running drift analysis...**")
+                    st.write("⚠️ This feature is currently in progress and will be available soon.")
+                    # result = subprocess.run([sys.executable, "models/drift_analysis.py"], capture_output=True, text=True)
+                    # st.write(result.stdout)
+                    # # mlflow.log_text(result.stdout, "logs/drift_analysis.log")
+                    # if result.returncode != 0:
+                    #     st.write(result.stderr)
+                    #     # mlflow.set_tag("status", "failed_drift_analysis")
+                    #     st.error("❌ Drift analysis failed.")
+                    #     status.update(label="Pipeline failed", state="error")
+                    #     st.stop()
+
+                    # st.write("📊 **Drift analysis completed!**")
 
                 run_metadata = {
                     "mode": run_mode,
@@ -248,7 +314,7 @@ with tabs[2]:
 
 # CLUSTER VISUALIZATION
 with tabs[3]:
-    if run_mode in ["clustering", "both"]:
+    if "clustering" in run_mode:
 
         # check most recent run metadata to see if anything should be displayed
         show_visualization = False
@@ -257,11 +323,14 @@ with tabs[3]:
             with open(run_info_path) as f:
                 run_info = json.load(f)
             last_mode = run_info.get("mode")
-            if last_mode in ["clustering", "both"]:
+            if isinstance(last_mode, str):
+                last_mode = [last_mode]
+            if "clustering" in last_mode:
                 show_visualization = True
 
         if show_visualization:
             st.header("📍 Cluster Map or Scatter")
+            # get latest clustered data file
             cluster_file = max(glob.glob("data/clustered/*.csv"), default=None, key=os.path.getmtime)
             if cluster_file:
                 df = pd.read_csv(cluster_file)
@@ -303,10 +372,12 @@ with tabs[3]:
 
 # LLM SUMMARY
 with tabs[4]:
-    if run_mode in ["llm_summary", "both"]:
+    if "llm_summary" in run_mode:
         st.header("🧠 LLM Summary")
 
-        summary_path = "data/summary/latest_summary.txt"
+        # get latest llm summary file
+        summary_path = max(glob.glob("data/summary/*.txt"), default=None, key=os.path.getmtime)
+        # summary_path = "data/summary/latest_summary.txt"
         if os.path.exists(summary_path):
             with open(summary_path) as f:
                 summary_text = f.read()
@@ -325,9 +396,71 @@ with tabs[4]:
 
 # PREVIEW CLEANED DATA
 with tabs[5]:
-    st.header("🔍 Cleaned Data Preview")
+    st.header("🔍 Cleaned Data Viewer")
     clean_file = max(glob.glob("data/processed/*.csv"), default=None, key=os.path.getmtime)
     if clean_file:
-        st.dataframe(pd.read_csv(clean_file).head(20))
+        st.dataframe(pd.read_csv(clean_file))
     else:
         st.info("No cleaned data available.")
+
+# CLOUD FILE BROWSER
+with tabs[6]:
+    st.header("☁️ View Mock Cloud Files")
+    st.markdown("This section allows you to browse and preview files stored in the mock cloud directory. This demo version uses a local directory to simulate a cloud storage system. In a real application, this would connect to an actual cloud service like AWS S3, Google Cloud Storage, etc. **To use real cloud storage**, clone the repository and set up as instructed in the README.")
+
+    mock_cloud_root = "mock_cloud"
+
+    if not os.path.exists(mock_cloud_root):
+        st.info("No mock cloud files found.")
+    else:
+        # Group files by their immediate subfolder
+        grouped_files = {}
+
+        for root, _, files in os.walk(mock_cloud_root):
+            rel_dir = os.path.relpath(root, mock_cloud_root)
+            if rel_dir == ".":
+                rel_dir = "root"
+
+            for f in files:
+                full_path = os.path.join(root, f)
+                grouped_files.setdefault(rel_dir, []).append((f, full_path))
+
+        if not grouped_files:
+            st.info("No files found in mock cloud.")
+        else:
+            for folder, files in sorted(grouped_files.items()):
+                with st.expander(f"📁 {folder}/", expanded=False):
+                    file_names = [f for f, _ in files]
+                    selected_file = st.selectbox(
+                        f"Select a file in '{folder}'", file_names, key=folder
+                    )
+
+                    selected_path = dict(files)[selected_file]
+
+                    st.markdown(f"**🗂 Previewing:** `{selected_file}`")
+
+                    # previewing the file content based on its type
+                    if selected_file.endswith(".json"):
+                        with open(selected_path) as f:
+                            content = f.read()
+                            st.json(json.loads(content))
+                    elif selected_file.endswith(".txt"):
+                        with open(selected_path) as f:
+                            content = f.read()
+                            st.text(content)
+                    elif selected_file.endswith(".csv"):
+                        df = pd.read_csv(selected_path)
+                        st.dataframe(df)
+                        content = df.to_csv(index=False)
+                    else:
+                        content = None
+                        st.warning("Unsupported file type for preview.")
+
+                    # downloading the file
+                    if content is not None:
+                        st.download_button(
+                            label="⬇️ Download File",
+                            data=content,
+                            file_name=selected_file,
+                            mime="text/plain" if selected_file.endswith(".txt") else "application/octet-stream"
+                        )
