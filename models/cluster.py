@@ -112,6 +112,8 @@ if __name__ == "__main__":
     print(f"✅ Saved centroids to {centroids_path}")
 
     # get metrics and save to cloud
+    # Ensure metrics directory exists
+    os.makedirs("data/metrics", exist_ok=True)
     metrics = calculate_metrics(model, features, clustered_df["cluster"])
     metrics_path = os.path.join("data/metrics", f"clustering_metrics_{now_str}.json")
     with open(metrics_path, "w") as f:
