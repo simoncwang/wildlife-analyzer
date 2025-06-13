@@ -51,6 +51,12 @@ if __name__ == "__main__":
         data = json.load(f)
 
     raw_obs = data.get("results", [])
+    
+    num_obs = len(raw_obs)
+    if num_obs == 0:
+        print("❌ No observations found in the input file")
+        exit(1)
+
     df = clean_observations(raw_obs)
 
     output_dir = "data/processed/"

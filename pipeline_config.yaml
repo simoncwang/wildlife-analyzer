@@ -1,12 +1,12 @@
 cloud_backend: mock
 date_range:
-  end: None
-  start: None
+  end: '2025-06-08'
+  start: '2025-06-13'
 location_name: Yellowstone National Park, US, WY
 n_clusters: 5
 per_page: 20
 run_mode:
 - llm_summary
 - clustering
-s3_bucket: wildlife-logs
+s3_bucket: null
 taxon_name: null
