@@ -330,6 +330,7 @@ with tabs[3]:
 
         if show_visualization:
             st.header("📍 Cluster Map or Scatter")
+            st.markdown("**NOTE:** The cluster color scale is currently using a continuous scale, which is not ideal for categorical clusters. This will be improved in future versions.")
             # get latest clustered data file
             cluster_file = max(glob.glob("data/clustered/*.csv"), default=None, key=os.path.getmtime)
             if cluster_file:
