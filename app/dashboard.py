@@ -439,28 +439,34 @@ with tabs[6]:
 
                     st.markdown(f"**🗂 Previewing:** `{selected_file}`")
 
-                    # previewing the file content based on its type
-                    if selected_file.endswith(".json"):
-                        with open(selected_path) as f:
-                            content = f.read()
-                            st.json(json.loads(content))
-                    elif selected_file.endswith(".txt"):
-                        with open(selected_path) as f:
-                            content = f.read()
-                            st.text(content)
-                    elif selected_file.endswith(".csv"):
-                        df = pd.read_csv(selected_path)
-                        st.dataframe(df)
-                        content = df.to_csv(index=False)
+                    # checking if file is empty
+                    if os.path.getsize(selected_path) == 0:
+                        st.warning("This file is empty.")
+                        continue
                     else:
-                        content = None
-                        st.warning("Unsupported file type for preview.")
 
-                    # downloading the file
-                    if content is not None:
-                        st.download_button(
-                            label="⬇️ Download File",
-                            data=content,
-                            file_name=selected_file,
-                            mime="text/plain" if selected_file.endswith(".txt") else "application/octet-stream"
-                        )
+                        # previewing the file content based on its type
+                        if selected_file.endswith(".json"):
+                            with open(selected_path) as f:
+                                content = f.read()
+                                st.json(json.loads(content))
+                        elif selected_file.endswith(".txt"):
+                            with open(selected_path) as f:
+                                content = f.read()
+                                st.text(content)
+                        elif selected_file.endswith(".csv"):
+                            df = pd.read_csv(selected_path)
+                            st.dataframe(df)
+                            content = df.to_csv(index=False)
+                        else:
+                            content = None
+                            st.warning("Unsupported file type for preview.")
+
+                        # downloading the file
+                        if content is not None:
+                            st.download_button(
+                                label="⬇️ Download File",
+                                data=content,
+                                file_name=selected_file,
+                                mime="text/plain" if selected_file.endswith(".txt") else "application/octet-stream"
+                            )
