@@ -10,8 +10,8 @@ The Wildlife Analyzer consists of a modular MLOps-style pipeline with the follow
 - **Modeling:** Depending on parameter settings, can run various ML and GenAI analyses on the data, including:
   - **KMeans Clustering** using Sci-Kit Learn (in which case there will be a **feature engineering** pipeline stage prior to clustering)
   - **LLM Summary** using gpt-4o through OpenAI API
-  - **LLM Analysis** gpt-4o analysis of the data, giving more directed insights and leveraging structured outputs
-  - **LLM QA** through a simple chat UI, allowing users to have multi-round conversations about the data
+  - **LLM Analysis (WIP)** gpt-4o analysis of the data, giving more directed insights and leveraging structured outputs
+  - **LLM QA (WIP)** through a simple chat UI, allowing users to have multi-round conversations about the data
 - **Visualization:** Depending on which modeling stages were run, the UI can display various visualizations of the results and metrics
 - **Logging/Monitoring:** Following common MLOps practices, various metrics and outputs are logged and saved in a cloud storage system (default a "mock cloud" in a local directory, but AWS S3 logging can be enabled if this repo is run locally)
 - **TODO:** While not currently implemented yet, I intend to add periodic monitoring logic to the project, along with automatic parameter updating and pipeline re-deployment based on metrics and performance to follow **CI/CD principles**, continuously testing/monitoring and delivering
