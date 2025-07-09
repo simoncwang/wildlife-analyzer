@@ -58,8 +58,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args_api_key = args.api_key
 
-    print("Received API key:", args_api_key)
-
     cfg = load_config()
     latest_file = sorted(os.listdir("data/processed"))[-1]
 
@@ -68,7 +66,7 @@ if __name__ == "__main__":
 
     observations = process_df(df)
 
-    summary = summarize_observations(observations)
+    summary = summarize_observations(observations, args_api_key=args_api_key)
     
     # save and log summary
     now_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
