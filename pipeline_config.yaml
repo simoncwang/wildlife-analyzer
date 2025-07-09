@@ -1,7 +1,7 @@
 cloud_backend: mock
 date_range:
-  end: '2025-06-08'
-  start: '2025-06-14'
+  start: '2025-06-08'
+  end: '2025-06-14'
 location_name: Yellowstone National Park, US, WY
 n_clusters: 5
 per_page: 20
