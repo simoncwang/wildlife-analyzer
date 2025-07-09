@@ -89,6 +89,8 @@ date_range = st.sidebar.checkbox("📅 Date Range", value=cfg.get("date_range") 
 if date_range:
     start_date = st.sidebar.date_input("Start Date")
     end_date = st.sidebar.date_input("End Date")
+else:
+    start_date, end_date = None, None
 
 if start_date and end_date and start_date > end_date:
     st.sidebar.error("Start date must be before end date.")

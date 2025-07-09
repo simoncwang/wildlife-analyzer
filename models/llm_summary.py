@@ -17,7 +17,7 @@ from pipeline.utils import load_config
 from pipeline.feature_engineering import load_clean_data
 from cloud.upload import upload_to_mock_cloud, upload_to_s3
 
-def summarize_observations(observations, model="gpt-4o", args_api_key=None):
+def summarize_observations(observations, model="gpt-4.1-nano-2025-04-14", args_api_key=None):
     if args_api_key:
         client = OpenAI(api_key=args_api_key)
     elif "openai" in st.secrets:
