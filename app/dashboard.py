@@ -73,6 +73,13 @@ run_mode = st.sidebar.multiselect(
     default=default_modes
 )
 
+openai_api_key = None
+if "llm_summary" in run_mode:
+    st.sidebar.markdown("### LLM Summary Parameters")
+    openai_api_key = st.sidebar.text_input(
+        "OpenAI API Key"
+    )
+
 if "clustering" in run_mode or "drift_analysis" in run_mode:
     n_clusters = st.sidebar.number_input("Number of Clusters for KMeans", min_value=1, max_value=20, value=cfg.get("n_clusters", 5))
 
@@ -146,6 +153,7 @@ with tabs[0]:
             - **Clustering**: Cluster the observations based on location and species.
             - **LLM Summary**: Generate a summary using a language model.
             - **Both**: Run both clustering and LLM summary.
+            - If using LLM summary, either set the OpenAI API key in Streamlit secrets or enter it into the input field.
         - Click "Save Parameters" to apply your settings.
     2. **Run Pipeline**: Click the "Run Full Pipeline" button in the "Run Pipeline" tab to execute the pipeline stages:
         - The pipeline stages include fetching data, preprocessing, feature engineering, clustering (if selected), and generating an LLM summary (if selected).
@@ -237,7 +245,10 @@ with tabs[1]:
 
                 if "llm_summary" in run_mode:
                     st.write("🧠 **Generating LLM summary...**")
-                    result = subprocess.run([sys.executable, "models/llm_summary.py"], capture_output=True, text=True)
+                    result = subprocess.run([sys.executable,
+                        "models/llm_summary.py",
+                        "--api_key", openai_api_key
+                        ], capture_output=True, text=True)
                     st.write(result.stdout)
                     # mlflow.log_text(result.stdout, "logs/llm_summary.log")
                     if result.returncode != 0:

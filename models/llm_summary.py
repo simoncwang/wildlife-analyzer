@@ -6,6 +6,7 @@ import sys
 import mlflow
 import time
 from datetime import datetime
+import argparse
 
 # Dynamically add project root to path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -16,8 +17,13 @@ from pipeline.utils import load_config
 from pipeline.feature_engineering import load_clean_data
 from cloud.upload import upload_to_mock_cloud, upload_to_s3
 
-def summarize_observations(observations, model="gpt-4o"):
-    client = OpenAI(api_key=st.secrets["openai"]["api_key"])
+def summarize_observations(observations, model="gpt-4o", args_api_key=None):
+    if args_api_key:
+        client = OpenAI(api_key=args_api_key)
+    elif "openai" in st.secrets:
+        client = OpenAI(api_key=st.secrets["openai"]["api_key"])
+    else:
+        raise ValueError("API key not provided. Please set the OPENAI_API_KEY in Streamlit secrets or enter it into the input field.")
 
     obs_text = "\n".join([f"{o['species']} at {o['location']} on {o['observed_on']}" for o in observations])
     prompt = f"Here are some recent wildlife observations:\n\n{obs_text}\n\nSummarize what was observed and any interesting patterns."
@@ -47,6 +53,11 @@ def process_df(df: pd.DataFrame) -> list:
     return observations
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--api_key", type=str, default=None)
+    args = parser.parse_args()
+    args_api_key = args.api_key
+
     cfg = load_config()
     latest_file = sorted(os.listdir("data/processed"))[-1]
 
