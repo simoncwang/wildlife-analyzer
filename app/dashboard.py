@@ -254,7 +254,7 @@ with tabs[1]:
                     st.write(result.stdout)
                     # mlflow.log_text(result.stdout, "logs/llm_summary.log")
                     if result.returncode != 0:
-                        # st.write(result.stderr)
+                        st.write(result.stderr)
                         # mlflow.set_tag("status", "failed_llm_summary")
                         st.error("❌ LLM summary failed.")
                         status.update(label="Pipeline failed", state="error")
